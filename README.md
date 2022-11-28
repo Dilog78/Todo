@@ -8,25 +8,37 @@ http://localhost:5000
 api:
 
 Post Method
+/registration
+Body:   email, password
+response { user }
+
+/login
+Body:   email, password
+response { token: token, notes: [] }
+
 /create
-Body:   title: string, description: string, priority: number
-response {}
+Body:   title, description, priority
+header: token
+response { note }
 
 Get Method
-/all
+header: token
+/getnotes
 /all?sort=title
 /all?sort=data
 /all?sort=datarev
 /all?sort=priority
-response [{},{}, ...]
+response [{note},{note}, ...]
 
 Delete Method
 /delete/:id
+header: token
 
 Put Method
 /update/:id
-Body:   title: string, description: string, priority: number
-response {}
+header: token
+Body:   title, description, priority
+response {note}
 
 
 
