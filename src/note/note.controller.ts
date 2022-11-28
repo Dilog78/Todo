@@ -1,32 +1,44 @@
-import { Body, Controller, Delete, Get, HttpException, Param, Post, Put, Query } from "@nestjs/common";
-import {NoteDto} from "./dto/note.dto";
-import {NoteService} from "./note.service";
-import { NoteDocument } from "../initDB/note.schema";
+import { Controller, Delete, Get, HttpException, Post, Put, UseGuards, Request, Param, Body } from "@nestjs/common";
+import { NoteDto } from "./dto/note.dto";
+import { NoteService } from "./note.service";
+import { NoteDocument } from "../schemas/note.schema";
+import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 
 
 @Controller()
 export class NoteController {
-    constructor(
-        private readonly noteService: NoteService
-    ) {}
+  constructor(
+    private readonly noteService: NoteService
+  ) {
+  }
 
-    @Post('create')
-    async create(@Body() createNote: NoteDto): Promise<NoteDocument> {
-        return await this.noteService.create(createNote);
-    }
+  @UseGuards(JwtAuthGuard)
+  @Post("create")
+  async createNote(@Request() req): Promise<NoteDocument> {
+    const { id } = req.user;
+    const createNote: NoteDto = req.body;
+    return await this.noteService.createNote(createNote, id);
+  }
 
-    @Get('all')
-    async getAll(@Query('sort') sort: string): Promise<NoteDocument[]> {
-        return await this.noteService.getAll(sort)
-    }
+  @UseGuards(JwtAuthGuard)
+  @Get("getnotes")
+  async getNotesSort(@Request() req): Promise<NoteDocument[]> {
+    const { id } = req.user;
+    const { sort } = req.query;
+    return await this.noteService.getNotesSort(sort, id);
+  }
 
-    @Delete('delete/:id')
-    async delete(@Param('id') id: number): Promise<HttpException> {
-        return await this.noteService.delete(id)
-    }
+  @UseGuards(JwtAuthGuard)
+  @Delete("delete/:id")
+  async deleteNote(@Request() req): Promise<HttpException> {
+    const noteId = req.params.id;
+    const userId = req.user.id;
+    return await this.noteService.deleteNote(noteId, userId);
+  }
 
-    @Put('update/:id')
-    async update(@Body() updateNote: NoteDto, @Param('id') id: number): Promise<NoteDocument> {
-        return this.noteService.update(updateNote, id)
-    }
+  @UseGuards(JwtAuthGuard)
+  @Put("update/:id")
+  async updateNote(@Body() updateNote: NoteDto, @Param("id") id: string): Promise<NoteDocument> {
+    return this.noteService.updateNote(updateNote, id);
+  }
 }
