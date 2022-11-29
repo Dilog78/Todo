@@ -24,10 +24,10 @@ response { note }
 Get Method
 header: token
 /getnotes
-/all?sort=title
-/all?sort=data
-/all?sort=datarev
-/all?sort=priority
+/getnotes?sort=title
+/getnotes?sort=data
+/getnotes?sort=datarev
+/getnotes?sort=priority
 response [{note},{note}, ...]
 
 Delete Method
