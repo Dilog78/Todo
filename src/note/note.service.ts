@@ -17,7 +17,7 @@ export class NoteService {
     const check = await this.userModel.findById(id);
 
     if (!check) {
-      throw new HttpException("User not found", 404);
+      throw new HttpException("User Unauthorized", HttpStatus.UNAUTHORIZED);
     }
 
     return await this.noteModel.create({ user: id, ...noteDto })
@@ -75,23 +75,20 @@ export class NoteService {
   }
 
   async deleteNote(noteId: string, userId: string): Promise<HttpException> {
-    try {
-      await this.noteModel.deleteOne({ _id: noteId });
-      await this.userModel.findByIdAndUpdate({ _id: userId }, { $pull: { note: noteId } });
 
-    } catch (e) {
-      if (e) {
-        throw new HttpException(`note does not exist, ${e}`, HttpStatus.BAD_REQUEST);
-      }
-    }
+    const user = await this.userModel.findByIdAndUpdate({ _id: userId }, { $pull: { note: noteId } });
+    if (!user) throw new HttpException(`User UNAUTHORIZED`, HttpStatus.UNAUTHORIZED);
+
+    const note = await this.noteModel.deleteOne({ _id: noteId });
+    if (!note.deletedCount) throw new HttpException(`note does not exist`, HttpStatus.BAD_REQUEST);
+
     return new HttpException("succes", HttpStatus.OK);
   }
 
-  //
   async updateNote(updateNote: NoteDto, id: string): Promise<NoteDocument> {
 
     const note = await this.noteModel.findOneAndUpdate({ _id: id }, { ...updateNote });
-    if (!note) throw new HttpException("note does not update", HttpStatus.BAD_REQUEST)
+    if (!note) throw new HttpException("note does not update", HttpStatus.BAD_REQUEST);
 
     return this.noteModel.findById(id);
   }
