@@ -33,9 +33,8 @@ export class NoteService {
   async getNotesSort(sort: string, id: string): Promise<NoteDocument[]> {
 
     const user = await this.userModel.findById(id).populate("note");
+    if(!user) throw new HttpException("UNAUTHORIZED", HttpStatus.UNAUTHORIZED);
     const userResponse = JSON.parse(JSON.stringify(user));
-
-    if(!user) throw new HttpException("", HttpStatus.UNAUTHORIZED); 
 
     if (sort === "title") {
       return userResponse.note.sort((a, b) => a.title - b.title);
