@@ -30,39 +30,58 @@ export class NoteService {
       });
   }
 
-  async getNotesSort(sort: string, id: string): Promise<NoteDocument[]> {
-
-    const user = await this.userModel.findById(id).populate("note");
-    if(!user) throw new HttpException("UNAUTHORIZED", HttpStatus.UNAUTHORIZED);
-    const userResponse = JSON.parse(JSON.stringify(user));
-
+  async getNotesSort(sort: string, id: string): Promise<Note[]> {
     if (sort === "title") {
-      return userResponse.note.sort((a, b) => a.title - b.title);
+      return await this.userModel.findById(id).populate({
+        path: "note",
+        options: { sort: { "title": 1 } }
+      }).then(user => {
+        if (!user) throw new HttpException("UNAUTHORIZED", HttpStatus.UNAUTHORIZED);
+        return user.note;
+      });
     }
     if (sort === "date") {
-      return userResponse.note.sort((a, b) => a.createdAt - b.createdAt);
+      return await this.userModel.findById(id).populate({
+        path: "note",
+        options: { sort: { "createdAt": 1 } }
+      }).then(user => {
+        if (!user) throw new HttpException("UNAUTHORIZED", HttpStatus.UNAUTHORIZED);
+        return user.note;
+      });
     }
     if (sort === "daterev") {
-      return userResponse.note.sort((a, b) => {
-        if (b.createdAt < a.createdAt) {
-          return -1;
-        }
+      return await this.userModel.findById(id).populate({
+        path: "note",
+        options: { sort: { "createdAt": -1 } }
+      }).then(user => {
+        if (!user) throw new HttpException("UNAUTHORIZED", HttpStatus.UNAUTHORIZED);
+        return user.note;
       });
     }
     if (sort === "priority") {
-      return userResponse.note.sort((a, b) => a.priority - b.priority);
+      return await this.userModel.findById(id).populate({
+        path: "note",
+        options: { sort: { "priority": 1 } }
+      }).then(user => {
+        if (!user) throw new HttpException("UNAUTHORIZED", HttpStatus.UNAUTHORIZED);
+        return user.note;
+      });
     }
-    return userResponse.note;
+    return await this.userModel.findById(id).populate("note")
+      .then(user => {
+        if (!user) throw new HttpException("UNAUTHORIZED", HttpStatus.UNAUTHORIZED);
+        return user.note;
+      });
   }
 
   async deleteNote(noteId: string, userId: string): Promise<HttpException> {
     try {
-      await this.noteModel.deleteOne({ _id: noteId })
-      await this.userModel.findByIdAndUpdate({_id: userId}, {$pull: {note: noteId}})
+      await this.noteModel.deleteOne({ _id: noteId });
+      await this.userModel.findByIdAndUpdate({ _id: userId }, { $pull: { note: noteId } });
 
     } catch (e) {
       if (e) {
-        throw new HttpException(`note does not exist, ${e}` , HttpStatus.BAD_REQUEST);
+        throw new HttpException(`note does not exist, ${e}`, HttpStatus.BAD_REQUEST);
       }
     }
     return new HttpException("succes", HttpStatus.OK);
@@ -71,15 +90,10 @@ export class NoteService {
   //
   async updateNote(updateNote: NoteDto, id: string): Promise<NoteDocument> {
 
-    try {
-      await this.noteModel.findOneAndUpdate({ _id: id }, { ...updateNote });
+    const note = await this.noteModel.findOneAndUpdate({ _id: id }, { ...updateNote });
+    if (!note) throw new HttpException("note does not update", HttpStatus.BAD_REQUEST)
 
-    } catch (e) {
-      if (e) {
-        throw new HttpException("note does not update", HttpStatus.BAD_REQUEST);
-      }
-    }
-    return this.noteModel.findOne({ _id: id });
+    return this.noteModel.findById(id);
   }
 }
 

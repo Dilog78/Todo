@@ -1,7 +1,7 @@
 import { Controller, Delete, Get, HttpException, Post, Put, UseGuards, Request, Param, Body } from "@nestjs/common";
 import { NoteDto } from "./dto/note.dto";
 import { NoteService } from "./note.service";
-import { NoteDocument } from "../schemas/note.schema";
+import { Note, NoteDocument } from "../schemas/note.schema";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 
 
@@ -22,7 +22,7 @@ export class NoteController {
 
   @UseGuards(JwtAuthGuard)
   @Get("getnotes")
-  async getNotesSort(@Request() req): Promise<NoteDocument[]> {
+  async getNotesSort(@Request() req): Promise<Note[]> {
     const { id } = req.user;
     const { sort } = req.query;
     return await this.noteService.getNotesSort(sort, id);
