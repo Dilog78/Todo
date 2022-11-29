@@ -35,6 +35,8 @@ export class NoteService {
     const user = await this.userModel.findById(id).populate("note");
     const userResponse = JSON.parse(JSON.stringify(user));
 
+    if(!user) throw new HttpException("", HttpStatus.UNAUTHORIZED); 
+
     if (sort === "title") {
       return userResponse.note.sort((a, b) => a.title - b.title);
     }
