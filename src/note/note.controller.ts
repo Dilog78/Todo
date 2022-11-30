@@ -3,6 +3,7 @@ import { NoteDto } from "./dto/note.dto";
 import { NoteService } from "./note.service";
 import { Note, NoteDocument } from "../schemas/note.schema";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { UpdateNoteDto } from "./dto/updateNote.dto";
 
 
 @Controller()
@@ -38,7 +39,7 @@ export class NoteController {
 
   @UseGuards(JwtAuthGuard)
   @Put("update/:id")
-  async updateNote(@Body() updateNote: NoteDto, @Param("id") id: string): Promise<NoteDocument> {
+  async updateNote(@Body() updateNote: UpdateNoteDto, @Param("id") id: string): Promise<NoteDocument> {
     return this.noteService.updateNote(updateNote, id);
   }
 }

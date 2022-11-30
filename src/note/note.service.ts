@@ -4,6 +4,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Note, NoteDocument } from "../schemas/note.schema";
 import { Model } from "mongoose";
 import { User, UserDocument } from "../schemas/user.schema";
+import { UpdateNoteDto } from "./dto/updateNote.dto";
 
 @Injectable()
 export class NoteService {
@@ -85,7 +86,7 @@ export class NoteService {
     return new HttpException("succes", HttpStatus.OK);
   }
 
-  async updateNote(updateNote: NoteDto, id: string): Promise<NoteDocument> {
+  async updateNote(updateNote: UpdateNoteDto, id: string): Promise<NoteDocument> {
 
     const note = await this.noteModel.findOneAndUpdate({ _id: id }, { ...updateNote });
     if (!note) throw new HttpException("note does not update", HttpStatus.BAD_REQUEST);

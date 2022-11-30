@@ -15,6 +15,9 @@ export class Note {
   @Prop({ required: true })
   priority: number;
 
+  @Prop({ required: true, default: false})
+  status: boolean;
+
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: "User", required: true })
   user: User;
 
