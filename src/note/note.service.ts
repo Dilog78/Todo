@@ -31,6 +31,16 @@ export class NoteService {
       });
   }
 
+  async getCompleted(id: string): Promise<Note[]> {
+    return await this.userModel.findById(id).populate({
+      path: "note",
+      match: { status: true }
+    }).then(user => {
+      if (!user) throw new HttpException("UNAUTHORIZED", HttpStatus.UNAUTHORIZED);
+      return user.note;
+    });
+  }
+
   async getNotesSort(sort: string, id: string): Promise<Note[]> {
     if (sort === "title") {
       return await this.userModel.findById(id).populate({

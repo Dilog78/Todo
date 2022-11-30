@@ -27,10 +27,8 @@ export class AuthService {
       token: this.jwtService.sign({ id: user._id }, {
         secret: process.env.JWT_SECRET,
         expiresIn: '7d'}),
-      email: user.email,
-      notes: user.note
+      email: user.email
     };
-
   }
 }
 

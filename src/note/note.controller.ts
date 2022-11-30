@@ -30,6 +30,13 @@ export class NoteController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get('getnotes/completed')
+  async getCompleted(@Request() req): Promise<Note[]> {
+    const { id } = req.user;
+    return await this.noteService.getCompleted(id);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Delete("delete/:id")
   async deleteNote(@Request() req): Promise<HttpException> {
     const noteId = req.params.id;

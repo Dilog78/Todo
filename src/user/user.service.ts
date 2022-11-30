@@ -37,7 +37,6 @@ export class UserService {
   }
 
   async getUser(email: string): Promise<UserInterface> {
-    return this.userModel.findOne({email: email}).populate('note');
+    return this.userModel.findOne({email: email});
   }
-
 }

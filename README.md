@@ -14,7 +14,7 @@ response { user }
 
 /login
 Body:   email, password
-response { token: token, notes: [] }
+response { token, email }
 
 /create
 Body:   title, description, priority
@@ -24,11 +24,14 @@ response { note }
 Get Method
 header: token
 /getnotes
+/getnotes/completed -> only completed notes
+
 /getnotes?sort=title
 /getnotes?sort=data
 /getnotes?sort=datarev
 /getnotes?sort=priority
 response [{note},{note}, ...]
+
 
 Delete Method
 /delete/:id
