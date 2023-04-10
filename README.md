@@ -1,5 +1,3 @@
-
-
 npm install
 
 npm run start
@@ -9,29 +7,29 @@ api:
 
 Post Method
 /registration
-Body:   email, password
+Body: email, password
 response { user }
 
 /login
-Body:   email, password
+Body: email, password
 response { token, email }
 
 /create
-Body:   title, description, priority
+Body: title, description, priority
 header: token
-response { note }
+response { title, description, priority, status, user \_id, createdAt, updatedAt }
 
 Get Method
 header: token
 /getnotes
 /getnotes/completed -> only completed notes
+response [{note},{note}, ...]
 
 /getnotes?sort=title
 /getnotes?sort=data
 /getnotes?sort=datarev
 /getnotes?sort=priority
 response [{note},{note}, ...]
-
 
 Delete Method
 /delete/:id
@@ -40,9 +38,5 @@ header: token
 Put Method
 /update/:id
 header: token
-Body:   title, description, priority
+Body: title, description, priority
 response {note}
-
-
-
-
