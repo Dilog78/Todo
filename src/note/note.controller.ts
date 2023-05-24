@@ -1,9 +1,9 @@
 import { Controller, Delete, Get, HttpException, Post, Put, UseGuards, Request, Param, Body } from "@nestjs/common";
 import { NoteDto } from "./dto/note.dto";
 import { NoteService } from "./note.service";
-import { Note, NoteDocument } from "../schemas/note.schema";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { UpdateNoteDto } from "./dto/updateNote.dto";
+import {INote, TypeNotes} from "./types/note.interface";
 
 
 @Controller()
@@ -15,7 +15,7 @@ export class NoteController {
 
   @UseGuards(JwtAuthGuard)
   @Post("create")
-  async createNote(@Request() req): Promise<NoteDocument> {
+  async createNote(@Request() req): Promise<INote> {
     const { id } = req.user;
     const createNote: NoteDto = req.body;
     return await this.noteService.createNote(createNote, id);
@@ -23,7 +23,7 @@ export class NoteController {
 
   @UseGuards(JwtAuthGuard)
   @Get("getnotes")
-  async getNotesSort(@Request() req): Promise<Note[]> {
+  async getNotesSort(@Request() req): Promise<TypeNotes> {
     const { id } = req.user;
     const { sort } = req.query;
     return await this.noteService.getNotesSort(sort, id);
@@ -31,7 +31,7 @@ export class NoteController {
 
   @UseGuards(JwtAuthGuard)
   @Get('getnotes/completed')
-  async getCompleted(@Request() req): Promise<Note[]> {
+  async getCompleted(@Request() req): Promise<TypeNotes> {
     const { id } = req.user;
     return await this.noteService.getCompleted(id);
   }
@@ -46,7 +46,7 @@ export class NoteController {
 
   @UseGuards(JwtAuthGuard)
   @Put("update/:id")
-  async updateNote(@Body() updateNote: UpdateNoteDto, @Param("id") id: string): Promise<NoteDocument> {
+  async updateNote(@Body() updateNote: UpdateNoteDto, @Param("id") id: string): Promise<INote> {
     return this.noteService.updateNote(updateNote, id);
   }
 }
