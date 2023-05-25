@@ -10,6 +10,6 @@ interface INote {
     user: Types.ObjectId;
 }
 
-type TypeNotes = Types.ObjectId[] | INote[] ;
+type TypeNotes = Types.ObjectId[] | INote[];
 
 export {INote, TypeNotes}
