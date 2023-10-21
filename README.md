@@ -1,6 +1,6 @@
-npm install
+yarn install
 
-npm run start
+yarn start
 http://localhost:5000
 
 api:
