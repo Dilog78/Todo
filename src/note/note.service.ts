@@ -2,10 +2,10 @@ import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { NoteDto } from "./dto/note.dto";
 import { InjectModel } from "@nestjs/mongoose";
 import { Note, NoteDocument } from "../schemas/note.schema";
-import {Model} from "mongoose";
+import { Model } from "mongoose";
 import { User, UserDocument } from "../schemas/user.schema";
 import { UpdateNoteDto } from "./dto/updateNote.dto";
-import {INote, TypeNotes} from "./types/note.interface";
+import { INote, TypeNotes } from "./types/note.interface";
 
 @Injectable()
 export class NoteService {
@@ -15,6 +15,13 @@ export class NoteService {
   ) {
   }
 
+  private readonly collSort = new Map<String, String>([
+    ["title", "title"],
+    ["date", "createdAt"],
+    ["daterev", "createdAt"],
+    ["priority", "priority"]
+  ]);
+
   async createNote(noteDto: NoteDto, id: string): Promise<INote> {
     const check = await this.userModel.findById(id);
 
@@ -22,14 +29,14 @@ export class NoteService {
       throw new HttpException("User Unauthorized", HttpStatus.UNAUTHORIZED);
     }
 
-     return  await this.noteModel.create({ user: id, ...noteDto })
-        .then(async newNote => {
-          await this.userModel.updateOne({ _id: id }, { $push: { note: newNote._id } });
-          return newNote;
-        })
-        .catch(err => {
-          throw new Error(err.message);
-        });
+    return await this.noteModel.create({ user: id, ...noteDto })
+      .then(async newNote => {
+        await this.userModel.updateOne({ _id: id }, { $push: { note: newNote._id } });
+        return newNote;
+      })
+      .catch(err => {
+        throw new Error(err.message);
+      });
   }
 
   async getCompleted(id: string): Promise<TypeNotes> {
@@ -43,47 +50,18 @@ export class NoteService {
   }
 
   async getNotesSort(sort: string, id: string): Promise<TypeNotes> {
-    if (sort === "title") {
-      return await this.userModel.findById(id).populate({
-        path: "note",
-        options: { sort: { "title": 1 } }
-      }).then(user => {
-        if (!user) throw new HttpException("UNAUTHORIZED", HttpStatus.UNAUTHORIZED);
-        return user.note;
-      });
-    }
-    if (sort === "date") {
-      return await this.userModel.findById(id).populate({
-        path: "note",
-        options: { sort: { "createdAt": 1 } }
-      }).then(user => {
-        if (!user) throw new HttpException("UNAUTHORIZED", HttpStatus.UNAUTHORIZED);
-        return user.note;
-      });
-    }
-    if (sort === "daterev") {
-      return await this.userModel.findById(id).populate({
-        path: "note",
-        options: { sort: { "createdAt": -1 } }
-      }).then(user => {
-        if (!user) throw new HttpException("UNAUTHORIZED", HttpStatus.UNAUTHORIZED);
-        return user.note;
-      });
-    }
-    if (sort === "priority") {
-      return await this.userModel.findById(id).populate({
-        path: "note",
-        options: { sort: { "priority": 1 } }
-      }).then(user => {
-        if (!user) throw new HttpException("UNAUTHORIZED", HttpStatus.UNAUTHORIZED);
-        return user.note;
-      });
-    }
-    return await this.userModel.findById(id).populate("note")
-      .then(user => {
-        if (!user) throw new HttpException("UNAUTHORIZED", HttpStatus.UNAUTHORIZED);
-        return user.note;
-      });
+
+    const sortValue = this.collSort.get(sort);
+
+    return this.userModel.findById(id).populate({
+      path: 'note',
+      options: { sort: sortValue }
+    }).then(user => {
+      if (!user) {
+        throw new HttpException("UNAUTHORIZED", HttpStatus.UNAUTHORIZED);
+      }
+      return user.note;
+    });
   }
 
   async deleteNote(noteId: string, userId: string): Promise<HttpException> {
