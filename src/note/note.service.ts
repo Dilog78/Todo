@@ -18,7 +18,7 @@ export class NoteService {
   private readonly collSort = new Map<String, String>([
     ["title", "title"],
     ["date", "createdAt"],
-    ["daterev", "createdAt"],
+    ["daterev", "-createdAt"],
     ["priority", "priority"]
   ]);
 
